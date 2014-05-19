@@ -60,28 +60,69 @@ echo "%piadmin ALL=(ALL) NOPASSWD: ALL" >> /etc/sudoers
 
 ############################################
 # Configure SSHD
+sed -i "s/^[ \t\v\f]*PermitRootLogin.*/PermitRootLogin no/g" /etc/ssh/sshd_config
 
 ############################################
 # Configure Checkin
+crontab -lu pi001 > /root/crontab-pi001.pre
+
+mkdir -p /home/pi001/bin
+
+cat - > /home/pi001/bin/checkin.sh <<EOF
+#!/bin/bash
+
+curl http://web.wtfoo.net/pear/check.igc?name=`hostname`\&ip=`/sbin/ifconfig eth0 | grep "inet addr" | cut -f2 -d: | cut -f1 -d" "` >/dev/null 2>&1
+
+EOF
+
+chmod a+x /home/pi001/bin/checkin.sh
+
+echo "*/5 * * * * /home/pi001/bin/checkin.sh" | crontab -u pi001 -
 
 ############################################
 # Configure Auto SSH Tunnels
+sudo -u pi001 ssh-keygen -t rsa -f /home/pi001/.ssh/id_rsa -N ""
+sudo -u pi002 ssh-keygen -t rsa -f /home/pi002/.ssh/id_rsa -N ""
+sudo -u pi003 ssh-keygen -t rsa -f /home/pi003/.ssh/id_rsa -N ""
+
+sudo -u pi001 sh -c "curl https://github.com/bmallen-xs.keys > /home/pi001/.ssh/authorized_keys"
+sudo -u pi002 sh -c "curl https://github.com/bmallen-xs.keys > /home/pi002/.ssh/authorized_keys"
+sudo -u pi003 sh -c "curl https://github.com/bmallen-xs.keys > /home/pi003/.ssh/authorized_keys"
 
 ############################################
 # Configure Wifi
 # /etc/wpa_supplicant/wpa_supplicant.conf
+cat - > /etc/wpa_supplicant/wpa_supplicant.conf <<EOF
+ctrl_interface=DIR=/var/run/wpa_supplicant GROUP=netdev
+update_config=1
+
+network={
+	ssid="pifinet"
+	psk="pienettest"
+}
+
+EOF
 
 ############################################
 # Configure DNS
 
 ############################################
-# Configure Web Server - apache and/or nginx
+# Configure Backups
+
 
 ############################################
-# Configure Monitoring Tools - nsca, sar, ksar
+# Configure Web Server - apache and/or nginx
+apt-get install nginx -y
+
+############################################
+# Configure Monitoring Tools - nsca, nrpe, sar
+apt-get install sysstat -y
+#sed -i "s/ENABLED=\"false\"/ENABLED=\"true\"/g" /etc/default/sysstat
+
+apt-get install nagios-nrpe-server nsca-client -y 
 
 ############################################
 # Configure iptables
-
+iptables-save > /root/iptables-save.pre
 
 
