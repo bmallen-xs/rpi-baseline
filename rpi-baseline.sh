@@ -64,6 +64,7 @@ sed -i "s/^[ \t\v\f]*PermitRootLogin.*/PermitRootLogin no/g" /etc/ssh/sshd_confi
 
 ############################################
 # Configure Checkin
+# Todo: update for "Where's my Pi"
 crontab -lu pi001 > /root/crontab-pi001.pre
 
 mkdir -p /home/pi001/bin
