@@ -34,15 +34,38 @@ apt-get update -y
 
 apt-get upgrade -y
 
-apt-get install -y motion autossh nfs-common links lynx irssi screen nmap 
+apt-get install -y motion autossh nfs-common links lynx irssi screen nmap curl
 
 apt-get install -y libnet-ssh2-perl liblwp-protocol-https-perl libnet-openssh-perl libconfig-ini-perl libconfig-simple-perl libxml-simple-perl 
 
 ############################################
 # Configure Users
-useradd -m --password '$6$RpUQoZyN$ORxZCmeMMh4pQYOyXw6czjK4HZoN3KBd30i0SYvDEBvXDuWgKXQSM.H0wXKaIJeLGplk8QpySFQ/GYfETjIj30' pi001
-useradd -m --password '$6$RpUQoZyN$ORxZCmeMMh4pQYOyXw6czjK4HZoN3KBd30i0SYvDEBvXDuWgKXQSM.H0wXKaIJeLGplk8QpySFQ/GYfETjIj30' pi002
-useradd -m --password '$6$RpUQoZyN$ORxZCmeMMh4pQYOyXw6czjK4HZoN3KBd30i0SYvDEBvXDuWgKXQSM.H0wXKaIJeLGplk8QpySFQ/GYfETjIj30' pi003
+id pi001
+
+if [ $? -eq 0 ]
+then 
+  echo User pi001 already exists
+else
+  useradd -m --password '$6$RpUQoZyN$ORxZCmeMMh4pQYOyXw6czjK4HZoN3KBd30i0SYvDEBvXDuWgKXQSM.H0wXKaIJeLGplk8QpySFQ/GYfETjIj30' pi001
+fi
+
+id pi002
+
+if [ $? -eq 0 ]
+then 
+  echo User pi002 already exists
+else
+  useradd -m --password '$6$RpUQoZyN$ORxZCmeMMh4pQYOyXw6czjK4HZoN3KBd30i0SYvDEBvXDuWgKXQSM.H0wXKaIJeLGplk8QpySFQ/GYfETjIj30' pi002
+fi
+
+id pi003
+
+if [ $? -eq 0 ]
+then 
+  echo User pi003 already exists
+else
+  useradd -m --password '$6$RpUQoZyN$ORxZCmeMMh4pQYOyXw6czjK4HZoN3KBd30i0SYvDEBvXDuWgKXQSM.H0wXKaIJeLGplk8QpySFQ/GYfETjIj30' pi003
+fi
 
 ############################################
 # Configure Groups
