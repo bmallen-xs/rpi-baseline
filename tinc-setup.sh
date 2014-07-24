@@ -6,13 +6,14 @@
 #################################
 # Config Items
 #################################
-HOST=something
+HOST=`hostname | cut -f1 -d. | tr -d "-"`
+MYIP=10.240.0.5
 TUN_NAME=myvpn
 
 #################################
 # Install tinc
 #################################
-apt-get install tinc
+apt-get install -y tinc
 
 #################################
 # Create Required Directories
@@ -22,12 +23,20 @@ mkdir -p /etc/tinc/$TUN_NAME/hosts
 #################################
 # Setup This Host Config
 #################################
-vi /etc/tinc/$TUN_NAME/hosts/$HOST
+cat <<EOF >/etc/tinc/$TUN_NAME/hosts/$HOST
+Subnet = $MYIP/32
+
+EOF
 
 #################################
 # Setup tunnel Config
 #################################
-vi /etc/tinc/$TUN_NAME/tinc.conf
+cat <<EOF >/etc/tinc/$TUN_NAME/tinc.conf
+Name = $HOST
+AddressFamily = ipv4
+Interface = tun0
+ConnectTo = ares
+EOF
 
 #################################
 # Generate Key
@@ -39,12 +48,15 @@ tincd -n $TUN_NAME -K4096
 #################################
 cat <<EOF >/etc/tinc/$TUN_NAME/tinc-up
 #!/bin/sh
-ifconfig $INTERFACE 10.240.0.4 netmask 255.255.255.0
+ifconfig \$INTERFACE $MYIP netmask 255.255.255.0
 EOF
 
 cat <<EOF >/etc/tinc/$TUN_NAME/tinc-down
+#!/bin/sh
 ifconfig $INTERFACE down
 EOF
+
+chmod 755 /etc/tinc/$TUN_NAME/tinc-*
 
 #################################
 # Set this tunnel to start on boot
